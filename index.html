@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的 Base64 轉換工具</title>
+    <style>
+        /* 這裡是一點簡單的 CSS，讓網頁變漂亮 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 { color: #1a73e8; margin-bottom: 1.5rem; }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: none;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-encode { background-color: #1a73e8; color: white; }
+        .btn-decode { background-color: #34a853; color: white; }
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.98); }
+        .result-label {
+            text-align: left;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Base64 轉換器</h1>
+    
+    <div class="result-label">輸入文字：</div>
+    <textarea id="inputText" placeholder="請在此輸入文字或 Base64 碼..."></textarea>
+
+    <div class="button-group">
+        <button class="btn-encode" onclick="process('encode')">開始編碼</button>
+        <button class="btn-decode" onclick="process('decode')">開始解碼</button>
+    </div>
+
+    <div class="result-label">輸出結果：</div>
+    <textarea id="outputText" placeholder="轉換結果會顯示在這裡..." readonly></textarea>
+</div>
+
+<script>
+    // 這裡是用 JavaScript 寫的功能邏輯
+    function process(type) {
+        const input = document.getElementById('inputText').value;
+        const outputField = document.getElementById('outputText');
+
+        if (!input) {
+            alert("請先輸入內容！");
+            return;
+        }
+
+        try {
+            if (type === 'encode') {
+                // 使用 btoa 進行 Base64 編碼，配合 encodeURIComponent 支援中文
+                const encoded = btoa(encodeURIComponent(input).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                    return String.fromCharCode('0x' + p1);
+                }));
+                outputField.value = encoded;
+            } else {
+                // 使用 atob 進行 Base64 解碼
+                const decoded = decodeURIComponent(Array.prototype.map.call(atob(input), (c) => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                outputField.value = decoded;
+            }
+        } catch (e) {
+            alert("轉換出錯！請檢查 Base64 格式是否正確。");
+            console.error(e);
+        }
+    }
+</script>
+
+</body>
+</html>
